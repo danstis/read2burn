@@ -80,6 +80,7 @@ jobs:
           push: true
           tags: |
             ${{ github.repository }}:latest
+            ${{ github.repository }}:${{ steps.gitversion.outputs.shortsha }}
             ${{ github.repository }}:${{ steps.gitversion.outputs.major }}
             ${{ github.repository }}:${{ steps.gitversion.outputs.major }}.${{ steps.gitversion.outputs.minor }}
             ${{ github.repository }}:${{ steps.gitversion.outputs.semVer }}
