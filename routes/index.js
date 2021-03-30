@@ -54,6 +54,7 @@ exports.index = function (req, res) {
             const decrypted =
               decipher.update(encrypted, "hex", "utf8") +
               decipher.final("utf8");
+              /*eslint no-unused-vars: "warn"*/
             nedb.remove({ key }, function (err, numDeleted) {
               nedb.persistence.compactDatafile();
             });
