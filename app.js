@@ -12,7 +12,7 @@ const express = require('express')
 
 const app = express();
 const umzug = new Umzug();
-const i18n = require("i18n");
+const i18n = require('i18n');
 
 // default: using 'accept-language' header to guess language settings
 app.use(i18n.init);
@@ -37,6 +37,7 @@ i18n.configure({
 app.get('/', routes.index);
 app.post('/', routes.index);
 
+/*eslint no-unused-vars: "warn"*/
 umzug.up().then(function (migrations) {
     // "migrations" will be an Array with the names of the
     // executed migrations.
@@ -44,12 +45,12 @@ umzug.up().then(function (migrations) {
 
 // start server
 http.createServer(app).listen(app.get('port'), function () {
-    console.log("Express server listening on port " + app.get('port'));
+    console.log('Express server listening on port ' + app.get('port'));
 });
 
 // schedule regular cleanup
 cron.schedule('12 1 * * *', function () {
-    console.log("Cleanup proceeding...")
+    console.log('Cleanup proceeding...')
     const expireTime = new Date().getTime() - 8640000000;
     nedb.remove({timestamp: {$lte: expireTime}}, { multi: true }, function(err, numDeleted) {
         console.log('Deleted', numDeleted, 'entries');
