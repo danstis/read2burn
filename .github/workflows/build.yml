@@ -38,7 +38,7 @@ jobs:
 
       - uses: brpaz/hadolint-action@v1.3.1
         with:
-          dockerfile: ./docker/dockerfile
+          dockerfile: ./docker/Dockerfile
 
   docker:
     name: Docker Build and Push
