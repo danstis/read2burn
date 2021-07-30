@@ -20,7 +20,7 @@
   "main": "app.js",
   "devDependencies": {
     "babel-eslint": "^10.1.0",
-    "eslint": "^7.23.0",
+    "eslint": "^7.32.0",
     "prettier": "^2.2.1"
   },
   "author": "wemove",
