@@ -20,7 +20,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-       - name: Check out code
+      - name: Check out code
         uses: actions/checkout@v2.4.0
         with:
           fetch-depth: 0
