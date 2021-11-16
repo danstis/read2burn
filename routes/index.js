@@ -47,13 +47,8 @@ exports.index = function (req, res) {
           if (doc.encrypted && req.body.show) {
             const encrypted = doc.encrypted;
             const decipherSecret = new Buffer(password).toString("binary");
-            const decipher = crypto.createDecipher(
-              CIPHER_ALGORITHM,
-              decipherSecret
-            );
-            const decrypted =
-              decipher.update(encrypted, "hex", "utf8") +
-              decipher.final("utf8");
+            const decipher = crypto.createDecipher(CIPHER_ALGORITHM, decipherSecret);
+            const decrypted = decipher.update(encrypted, "hex", "utf8") + decipher.final("utf8");
             /*eslint no-unused-vars: "warn"*/
             nedb.remove({ key }, function (err, numDeleted) {
               nedb.persistence.compactDatafile();
@@ -95,7 +90,8 @@ exports.index = function (req, res) {
   }
 };
 
+// Generate a random string of a given length, if no length is given, return a random string of length 7
 function uid(len) {
-  len = len || 7;
-  return Math.random().toString(35).substr(2, len);
+  const buf = crypto.randomBytes(len || 7);
+  return buf.toString("hex");
 }
