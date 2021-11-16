@@ -10,8 +10,8 @@ WORKDIR ${READ2BURN_HOME}
 # hadolint ignore=DL3018
 RUN apk add --no-cache tzdata
 COPY . ${READ2BURN_HOME}
-RUN npm ci --only=production
-RUN rm -rf ${READ2BURN_HOME}/docker
+RUN npm ci --only=production \
+	rm -rf ${READ2BURN_HOME}/docker
 
 ####################
 # Create image
