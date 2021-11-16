@@ -56,9 +56,6 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@master # https://github.com/marketplace/actions/sonarcloud-scan
         with:
           args: >
-            -Dsonar.organization=danstis
-            -Dsonar.projectKey=danstis_${{ github.repository }}
-            -Dsonar.projectName=${{ github.repository }}
             -Dsonar.projectVersion=${{ steps.gitversion.outputs.FullSemVer }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
