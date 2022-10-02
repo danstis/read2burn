@@ -5,12 +5,16 @@ FROM node:lts-alpine AS builder
 
 ENV READ2BURN_HOME="/app"
 
+ARG BUILD=0.0.0-development
+
 WORKDIR ${READ2BURN_HOME}
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache tzdata
 COPY ./package* ${READ2BURN_HOME}
-RUN npm ci --only=production
+RUN npm ci --only=production &&\
+	npm version ${BUILD} --allow-same-version &&\
+	npx genversion version.js
 COPY ./ ${READ2BURN_HOME}
 RUN rm -rf ${READ2BURN_HOME}/docker
 
