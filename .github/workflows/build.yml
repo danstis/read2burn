@@ -98,13 +98,22 @@ jobs:
 
       - name: Login to DockerHub
         uses: docker/login-action@v1.10.0
+        if: ${{ github.actor != 'dependabot[bot]' }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Docker build only
+        uses: docker/build-push-action@v2 # https://github.com/marketplace/actions/build-and-push-docker-images
+        if: ${{ github.actor == 'dependabot[bot]' }}
+        with:
+          context: ./
+          platforms: linux/amd64
+          push: false
+
       - name: Build and push
         uses: docker/build-push-action@v2 # https://github.com/marketplace/actions/build-and-push-docker-images
-        if: ${{ steps.gitversion.outputs.PreReleaseTagWithDash == '' }}
+        if: ${{ steps.gitversion.outputs.PreReleaseTagWithDash == '' && github.actor != 'dependabot[bot]' }}
         with:
           context: ./
           platforms: linux/amd64
@@ -118,7 +127,7 @@ jobs:
 
       - name: Build and push pre-release
         uses: docker/build-push-action@v2 # https://github.com/marketplace/actions/build-and-push-docker-images
-        if: ${{ steps.gitversion.outputs.PreReleaseTagWithDash != '' }}
+        if: ${{ steps.gitversion.outputs.PreReleaseTagWithDash != '' && github.actor != 'dependabot[bot]' }}
         with:
           context: ./
           platforms: linux/amd64
