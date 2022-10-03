@@ -1,6 +1,6 @@
 {
   "name": "read2burn",
-  "version": "1.2.3-test",
+  "version": "0.0.0-development",
   "private": true,
   "dependencies": {
     "bluebird": "^3.7.2",
