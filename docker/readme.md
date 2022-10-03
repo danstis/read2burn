@@ -6,7 +6,7 @@
 git clone https://github.com/danstis/read2burn.git .
 cd docker
 docker build --no-cache -t danstis/read2burn:<VERSION> .
-docker push danstis/read2burn:0.2
+docker push danstis/read2burn:<VERSION>
 ```
 
 ## Run the docker
