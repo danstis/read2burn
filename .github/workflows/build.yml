@@ -119,7 +119,7 @@ jobs:
           context: ./
           platforms: linux/amd64
           push: true
-          args: BUILD=${{ steps.gitversion.outputs.semVer }}
+          build-args: BUILD=${{ steps.gitversion.outputs.semVer }}
           tags: |
             ${{ github.repository }}:prerelease
             ${{ github.repository }}:${{ steps.gitversion.outputs.shortsha }}
@@ -134,7 +134,7 @@ jobs:
           context: ./
           platforms: linux/amd64
           push: true
-          args: BUILD=${{ steps.gitversion.outputs.semVer }}
+          build-args: BUILD=${{ steps.gitversion.outputs.semVer }}
           tags: |
             ${{ github.repository }}:latest
             ${{ github.repository }}:${{ steps.gitversion.outputs.shortsha }}
