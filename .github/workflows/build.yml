@@ -119,6 +119,7 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
+            ${{ github.repository }}:prerelease
             ${{ github.repository }}:${{ steps.gitversion.outputs.shortsha }}
             ${{ github.repository }}:${{ steps.gitversion.outputs.semVer }}
             ${{ github.repository }}:${{ steps.gitversion.outputs.escapedbranchname }}
