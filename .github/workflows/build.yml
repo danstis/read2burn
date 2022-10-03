@@ -110,8 +110,8 @@ jobs:
           context: ./
           platforms: linux/amd64
           push: false
-          build-args:
-            BUILD: ${{ steps.gitversion.outputs.semVer }}
+          build-args: |
+            BUILD=${{ steps.gitversion.outputs.semVer }}
 
       - name: Docker build and push pre-release
         uses: docker/build-push-action@v3 # https://github.com/marketplace/actions/build-and-push-docker-images
