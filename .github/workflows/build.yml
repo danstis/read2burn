@@ -56,7 +56,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3.5.0
         with:
-          node-version: 12
+          node-version: 18
 
       # ESLint must be in `package.json`
       - name: Install Node.js dependencies
