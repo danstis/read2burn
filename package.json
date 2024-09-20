@@ -14,7 +14,7 @@
     "mv": "^2.1.1",
     "nedb": "^1.8.0",
     "node-cron": "^3.0.2",
-    "rimraf": "^3.0.1",
+    "rimraf": "^6.0.1",
     "umzug": "^3.8.1"
   },
   "description": "A tool for communicating secret information.",
