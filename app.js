@@ -8,7 +8,7 @@ const express = require("express"),
   path = require("path"),
   bodyParser = require("body-parser"),
   cron = require("node-cron"),
-  Datastore = require("nedb"),
+  Datastore = require("@seald-io/nedb"),
   version = require("./version");
 
 const app = express();
@@ -69,7 +69,7 @@ cron.schedule(schedule, function () {
     { multi: true },
     function (err, numDeleted) {
       console.log("Deleted", numDeleted, "entries");
-      nedb.persistence.compactDatafile();
+      nedb.compactDatafile();
     }
   );
 });

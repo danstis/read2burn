@@ -69,7 +69,7 @@ exports.index = function (req, res) {
               decipher.final("utf8");
             /*eslint no-unused-vars: "warn"*/
             nedb.remove({ key }, function (err, numDeleted) {
-              nedb.persistence.compactDatafile();
+              nedb.compactDatafile();
             });
             res.render("index", {
               url: url,
