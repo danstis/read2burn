@@ -24,11 +24,18 @@ exports.index = function (req, res) {
       // if exists, create another key
       const password = uid(PASSWORD_KEY_LENGTH);
       const timestamp = new Date().getTime();
-      const cipherSecret = new Buffer.from(password, "binary");
-      const cipher = crypto.createCipher(CIPHER_ALGORITHM, cipherSecret);
-      encrypted = cipher.update(secret, "utf8", "hex") + cipher.final("hex");
-      const entry = { key, timestamp, encrypted };
+      const iv = crypto.randomBytes(16);
+      const derivedKey = crypto.createHash('sha256').update(password).digest();
+      const cipher = crypto.createCipheriv(CIPHER_ALGORITHM, derivedKey, iv);
+      encrypted = cipher.update(secret, 'utf8', 'hex') + cipher.final('hex');
+      const entry = { key, timestamp, encrypted, iv: iv.toString('hex') };
       nedb.insert(entry, function (err, doc) {
+        if (err) {
+          console.error("Error inserting record:", err);
+          // Handle the error appropriately
+          // For now, just log it and don't proceed
+          return;
+        }
         url = `${req.protocol}://${req.get("host")}/?key=${key + password}`;
         res.render("index", {
           url: url,
@@ -37,7 +44,9 @@ exports.index = function (req, res) {
           found: false,
           version: version,
         });
-        console.log("Inserted", doc.key, "with ID", doc._id);
+        if (doc) {
+          console.log("Inserted", doc.key, "with ID", doc._id);
+        }
       });
     } else if (req.query.key || req.body.key) {
       let p = req.query.key;
@@ -48,10 +57,12 @@ exports.index = function (req, res) {
         try {
           if (doc.encrypted && req.body.show) {
             const encrypted = doc.encrypted;
-            const decipherSecret = new Buffer.from(password, "binary");
-            const decipher = crypto.createDecipher(
+            const iv = Buffer.from(doc.iv, 'hex');
+            const derivedKey = crypto.createHash('sha256').update(password).digest();
+            const decipher = crypto.createDecipheriv(
               CIPHER_ALGORITHM,
-              decipherSecret
+              derivedKey,
+              iv
             );
             const decrypted =
               decipher.update(encrypted, "hex", "utf8") +

@@ -1,18 +1,18 @@
 /**
  * Module dependencies.
  */
+const { Umzug, JSONStorage } = require("umzug");
 const express = require("express"),
   routes = require("./routes"),
   http = require("http"),
   path = require("path"),
-  Umzug = require("umzug"),
   bodyParser = require("body-parser"),
   cron = require("node-cron"),
   Datastore = require("nedb"),
   version = require("./version");
 
 const app = express();
-const umzug = new Umzug();
+
 const i18n = require("i18n");
 
 // default: using 'accept-language' header to guess language settings
@@ -29,6 +29,11 @@ app.enable("trust proxy");
 app.disable("x-powered-by");
 
 const nedb = new Datastore({ filename: "data/read2burn.db", autoload: true });
+const umzug = new Umzug({
+  storage: new JSONStorage({ path: 'data/migrations.json' }),
+  context: nedb,
+  migrations: { glob: 'migrations/*.js' },
+});
 
 module.exports.nedb = nedb;
 
