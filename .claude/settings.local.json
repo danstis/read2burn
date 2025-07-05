@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(eslint:*)",
+      "Bash(npx eslint:*)",
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(rg:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}

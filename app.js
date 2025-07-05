@@ -1,18 +1,18 @@
 /**
  * Module dependencies.
  */
+const { Umzug, JSONStorage } = require("umzug");
 const express = require("express"),
   routes = require("./routes"),
   http = require("http"),
   path = require("path"),
-  Umzug = require("umzug"),
   bodyParser = require("body-parser"),
   cron = require("node-cron"),
-  Datastore = require("nedb"),
+  Datastore = require("@seald-io/nedb"),
   version = require("./version");
 
 const app = express();
-const umzug = new Umzug();
+
 const i18n = require("i18n");
 
 // default: using 'accept-language' header to guess language settings
@@ -29,6 +29,11 @@ app.enable("trust proxy");
 app.disable("x-powered-by");
 
 const nedb = new Datastore({ filename: "data/read2burn.db", autoload: true });
+const umzug = new Umzug({
+  storage: new JSONStorage({ path: 'data/migrations.json' }),
+  context: nedb,
+  migrations: { glob: 'migrations/*.js' },
+});
 
 module.exports.nedb = nedb;
 
@@ -41,9 +46,8 @@ i18n.configure({
 app.get("/", routes.index);
 app.post("/", routes.index);
 
-/*eslint no-unused-vars: "warn"*/
-umzug.up().then(function (migrations) {
-  // "migrations" will be an Array with the names of the
+umzug.up().then(function () {
+  // migrations will be an Array with the names of the
   // executed migrations.
 });
 
@@ -64,7 +68,7 @@ cron.schedule(schedule, function () {
     { multi: true },
     function (err, numDeleted) {
       console.log("Deleted", numDeleted, "entries");
-      nedb.persistence.compactDatafile();
+      nedb.compactDatafile();
     }
   );
 });

@@ -9,7 +9,7 @@ const version = require("../version");
 exports.index = function (req, res) {
   try {
     const nedb = app.nedb;
-    const CIPHER_ALGORITHM = "aes256";
+    const CIPHER_ALGORITHM = "aes-256-gcm";
     const ERR_NO_SUCH_ENTRY = "ERR_NO_SUCH_ENTRY";
     const FILE_KEY_LENGTH = 8;
     const PASSWORD_KEY_LENGTH = 12;
@@ -24,11 +24,19 @@ exports.index = function (req, res) {
       // if exists, create another key
       const password = uid(PASSWORD_KEY_LENGTH);
       const timestamp = new Date().getTime();
-      const cipherSecret = new Buffer.from(password, "binary");
-      const cipher = crypto.createCipher(CIPHER_ALGORITHM, cipherSecret);
-      encrypted = cipher.update(secret, "utf8", "hex") + cipher.final("hex");
-      const entry = { key, timestamp, encrypted };
+      const iv = crypto.randomBytes(12);
+      const derivedKey = crypto.createHash('sha256').update(password).digest();
+      const cipher = crypto.createCipheriv(CIPHER_ALGORITHM, derivedKey, iv);
+      encrypted = cipher.update(secret, 'utf8', 'hex') + cipher.final('hex');
+      const authTag = cipher.getAuthTag();
+      const entry = { key, timestamp, encrypted, iv: iv.toString('hex'), authTag: authTag.toString('hex') };
       nedb.insert(entry, function (err, doc) {
+        if (err) {
+          console.error("Error inserting record:", err);
+          // Handle the error appropriately
+          // For now, just log it and don't proceed
+          return;
+        }
         url = `${req.protocol}://${req.get("host")}/?key=${key + password}`;
         res.render("index", {
           url: url,
@@ -37,7 +45,9 @@ exports.index = function (req, res) {
           found: false,
           version: version,
         });
-        console.log("Inserted", doc.key, "with ID", doc._id);
+        if (doc) {
+          console.log("Inserted", doc.key, "with ID", doc._id);
+        }
       });
     } else if (req.query.key || req.body.key) {
       let p = req.query.key;
@@ -48,17 +58,20 @@ exports.index = function (req, res) {
         try {
           if (doc.encrypted && req.body.show) {
             const encrypted = doc.encrypted;
-            const decipherSecret = new Buffer.from(password, "binary");
-            const decipher = crypto.createDecipher(
+            const iv = Buffer.from(doc.iv, 'hex');
+            const authTag = Buffer.from(doc.authTag, 'hex');
+            const derivedKey = crypto.createHash('sha256').update(password).digest();
+            const decipher = crypto.createDecipheriv(
               CIPHER_ALGORITHM,
-              decipherSecret
+              derivedKey,
+              iv
             );
+            decipher.setAuthTag(authTag);
             const decrypted =
               decipher.update(encrypted, "hex", "utf8") +
               decipher.final("utf8");
-            /*eslint no-unused-vars: "warn"*/
-            nedb.remove({ key }, function (err, numDeleted) {
-              nedb.persistence.compactDatafile();
+            nedb.remove({ key }, function () {
+              nedb.compactDatafile();
             });
             res.render("index", {
               url: url,
