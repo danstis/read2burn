@@ -50,7 +50,7 @@ module.exports = {
                     // done. it tried fs.rename first, and then falls back to
                     // piping the source file to the dest file and then unlinking
                     // the source file.
-                    if (err) console.log(err);
+                    if (err) {console.log(err);}
                   });
                 });
                 if (fs.isEmptySync(itsPath)) {
@@ -70,7 +70,7 @@ module.exports = {
                       shortendPath +
                       '"'
                   );
-                  if (err) console.log(err);
+                  if (err) {console.log(err);}
                 });
               }
             }
