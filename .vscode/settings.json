@@ -24,5 +24,9 @@
     "vars",
     "wearerequired",
     "wemove"
-  ]
+  ],
+  "sonarlint.connectedMode.project": {
+    "connectionId": "danstis",
+    "projectKey": "danstis_read2burn"
+  }
 }

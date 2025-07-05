@@ -67,7 +67,7 @@ cron.schedule(schedule, function () {
     { multi: true },
     function (err, numDeleted) {
       console.log("Deleted", numDeleted, "entries");
-      nedb.compactDatafile();
+      nedb.persistence.compactDatafile();
     }
   );
 });
