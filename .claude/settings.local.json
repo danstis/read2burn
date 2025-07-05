@@ -5,7 +5,9 @@
       "Bash(eslint:*)",
       "Bash(npx eslint:*)",
       "Bash(rm:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(rg:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }
