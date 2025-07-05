@@ -1,9 +1,20 @@
-workflow: GitHubFlow/v1
-assembly-versioning-scheme: MajorMinorPatch
-ignore:
-  sha: []
-merge-message-formats: {}
-major-version-bump-message: (BREAKING CHANGES?|major)(\(.*?\))?:\s?
-minor-version-bump-message: (feature|minor|feat)(\(.*?\))?:\s?
-patch-version-bump-message: (fix|patch|hotfix)(\(.*?\))?:\s?
-no-bump-message: (build|chore|ci|doc|docs|none|perf|refactor|skip|test)(\(.*?\))?:\s?
+# GitVersion.yml ── v6 syntax
+workflow: GitHubFlow/v1          # keep the simple GitHub-Flow defaults
+commit-message-incrementing: Enabled   # parse commit messages on every branch
+
+assembly-versioning-scheme: MajorMinorPatch   # three segments
+
+# Branch-specific overrides
+branches:
+  main:
+    regex: ^main$                # just the main branch
+    tag: ''                      # never add a prerelease tag (no "-beta", etc.)
+    increment: Minor             # default bump when no commit-message regex matches
+    is-mainline: true            # treat main as the single mainline
+    prevent-increment-of-merged-branch-version: true
+
+# Commit-message bump triggers  ── unchanged from your file
+major-version-bump-message: '(BREAKING CHANGES?|major)(\(.*?\))?:\s?'
+minor-version-bump-message: '(feature|minor|feat)(\(.*?\))?:\s?'
+patch-version-bump-message: '(fix|patch|hotfix)(\(.*?\))?:\s?'
+no-bump-message: '(build|chore|ci|doc|docs|none|perf|refactor|skip|test)(\(.*?\))?:\s?'
