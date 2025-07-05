@@ -1,10 +1,34 @@
+workflow: GitFlow/v1
 assembly-versioning-scheme: MajorMinorPatch
-mode: Mainline
 branches:
-  master:
+  main:
     regex: ^main|^master
     increment: Minor
-increment: Minor
+    label: ''
+  develop:
+    mode: ContinuousDelivery
+    label: alpha
+    increment: Minor
+  release:
+    mode: ContinuousDelivery
+    label: beta
+    increment: Minor
+  feature:
+    mode: ContinuousDelivery
+    label: alpha
+    increment: Minor
+  hotfix:
+    mode: ContinuousDelivery
+    label: beta
+    increment: Patch
+  support:
+    mode: ContinuousDelivery
+    label: support
+    increment: Patch
+  pull-request:
+    mode: ContinuousDelivery
+    label: PullRequest
+    increment: Patch
 ignore:
   sha: []
 merge-message-formats: {}
