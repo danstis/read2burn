@@ -1,4 +1,4 @@
-// ESLint configuration migrated for v9+ (CommonJS syntax)
+// ESLint configuration migrated for v9+ (CommonJS syntax, flat config, manual recommended rules)
 
 /** @type {import('eslint').Linter.FlatConfig} */
 module.exports = [
@@ -21,9 +21,16 @@ module.exports = [
       reportUnusedDisableDirectives: true,
     },
     plugins: {},
-    rules: {},
-  },
-  {
-    extends: ['eslint:recommended'],
+    rules: {
+      'no-unused-vars': 'warn',
+      'no-undef': 'error',
+      'no-unreachable': 'error',
+      'no-console': 'off',
+      'no-debugger': 'warn',
+      'no-empty': 'warn',
+      'eqeqeq': 'warn',
+      'curly': 'warn',
+      'semi': ['warn', 'always'],
+    },
   },
 ];
