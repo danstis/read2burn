@@ -9,7 +9,7 @@ const version = require("../version");
 exports.index = function (req, res) {
   try {
     const nedb = app.nedb;
-    const CIPHER_ALGORITHM = "aes256";
+    const CIPHER_ALGORITHM = "aes-256-gcm";
     const ERR_NO_SUCH_ENTRY = "ERR_NO_SUCH_ENTRY";
     const FILE_KEY_LENGTH = 8;
     const PASSWORD_KEY_LENGTH = 12;
@@ -24,11 +24,12 @@ exports.index = function (req, res) {
       // if exists, create another key
       const password = uid(PASSWORD_KEY_LENGTH);
       const timestamp = new Date().getTime();
-      const iv = crypto.randomBytes(16);
+      const iv = crypto.randomBytes(12);
       const derivedKey = crypto.createHash('sha256').update(password).digest();
       const cipher = crypto.createCipheriv(CIPHER_ALGORITHM, derivedKey, iv);
       encrypted = cipher.update(secret, 'utf8', 'hex') + cipher.final('hex');
-      const entry = { key, timestamp, encrypted, iv: iv.toString('hex') };
+      const authTag = cipher.getAuthTag();
+      const entry = { key, timestamp, encrypted, iv: iv.toString('hex'), authTag: authTag.toString('hex') };
       nedb.insert(entry, function (err, doc) {
         if (err) {
           console.error("Error inserting record:", err);
@@ -58,12 +59,14 @@ exports.index = function (req, res) {
           if (doc.encrypted && req.body.show) {
             const encrypted = doc.encrypted;
             const iv = Buffer.from(doc.iv, 'hex');
+            const authTag = Buffer.from(doc.authTag, 'hex');
             const derivedKey = crypto.createHash('sha256').update(password).digest();
             const decipher = crypto.createDecipheriv(
               CIPHER_ALGORITHM,
               derivedKey,
               iv
             );
+            decipher.setAuthTag(authTag);
             const decrypted =
               decipher.update(encrypted, "hex", "utf8") +
               decipher.final("utf8");
