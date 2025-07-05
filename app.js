@@ -46,8 +46,8 @@ i18n.configure({
 app.get("/", routes.index);
 app.post("/", routes.index);
 
-umzug.up().then(function (_migrations) {
-  // "_migrations" will be an Array with the names of the
+umzug.up().then(function () {
+  // migrations will be an Array with the names of the
   // executed migrations.
 });
 

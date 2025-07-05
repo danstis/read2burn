@@ -70,7 +70,7 @@ exports.index = function (req, res) {
             const decrypted =
               decipher.update(encrypted, "hex", "utf8") +
               decipher.final("utf8");
-            nedb.remove({ key }, function (_err, _numDeleted) {
+            nedb.remove({ key }, function () {
               nedb.compactDatafile();
             });
             res.render("index", {
