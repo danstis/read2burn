@@ -6,7 +6,6 @@ const express = require("express"),
   routes = require("./routes"),
   http = require("http"),
   path = require("path"),
-  bodyParser = require("body-parser"),
   cron = require("node-cron"),
   Datastore = require("@seald-io/nedb"),
   version = require("./version");
@@ -24,7 +23,7 @@ app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 app.use(express.Router());
 app.use(express.static(path.join(__dirname, "public")));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false }));
 app.enable("trust proxy");
 app.disable("x-powered-by");
 
