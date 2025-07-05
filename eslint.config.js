@@ -1,7 +1,7 @@
-// ESLint configuration migrated for v9+
+// ESLint configuration migrated for v9+ (CommonJS syntax)
 
 /** @type {import('eslint').Linter.FlatConfig} */
-export default [
+module.exports = [
   {
     ignores: [
       'public/javascripts/*.js',
