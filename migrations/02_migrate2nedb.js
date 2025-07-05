@@ -9,8 +9,7 @@ const app = require("../app");
 
 module.exports = {
   up: function () {
-    /*eslint no-unused-vars: "warn"*/
-    return new Bluebird(function (resolve, reject) {
+    return new Bluebird(function (resolve) {
       console.log("MIGRATION 02_migrate2nedb.js: start migration to nedb.");
       const nedb = app.nedb;
       const dbPath = path.resolve(__dirname, "../data");
