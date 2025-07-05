@@ -9,8 +9,7 @@ const dir = path.resolve(__dirname, "../data");
 
 module.exports = {
   up: function () {
-    /*eslint no-unused-vars: "warn"*/
-    return new Bluebird(function (resolve, reject) {
+    return new Bluebird(function (resolve) {
       console.log(
         "MIGRATION 01_migrate_data_directories.js: Migrating old long data directories to 3 character directories."
       );
@@ -51,7 +50,7 @@ module.exports = {
                     // done. it tried fs.rename first, and then falls back to
                     // piping the source file to the dest file and then unlinking
                     // the source file.
-                    if (err) console.log(err);
+                    if (err) {console.log(err);}
                   });
                 });
                 if (fs.isEmptySync(itsPath)) {
@@ -71,7 +70,7 @@ module.exports = {
                       shortendPath +
                       '"'
                   );
-                  if (err) console.log(err);
+                  if (err) {console.log(err);}
                 });
               }
             }
