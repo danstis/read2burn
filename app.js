@@ -46,9 +46,8 @@ i18n.configure({
 app.get("/", routes.index);
 app.post("/", routes.index);
 
-/*eslint no-unused-vars: "warn"*/
-umzug.up().then(function (migrations) {
-  // "migrations" will be an Array with the names of the
+umzug.up().then(function (_migrations) {
+  // "_migrations" will be an Array with the names of the
   // executed migrations.
 });
 
