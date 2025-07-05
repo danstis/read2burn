@@ -15,6 +15,11 @@ module.exports = [
         document: 'readonly',
         module: 'writable',
         require: 'readonly',
+        process: 'readonly',
+        __dirname: 'readonly',
+        console: 'readonly',
+        Buffer: 'readonly',
+        exports: 'writable',
       },
     },
     linterOptions: {

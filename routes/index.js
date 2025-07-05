@@ -51,7 +51,7 @@ exports.index = function (req, res) {
       });
     } else if (req.query.key || req.body.key) {
       let p = req.query.key;
-      if (!p) p = req.body.key;
+      if (!p) {p = req.body.key;}
       const key = p.substr(0, FILE_KEY_LENGTH);
       const password = p.substr(FILE_KEY_LENGTH, PASSWORD_KEY_LENGTH);
       nedb.findOne({ key }, function (err, doc) {
@@ -90,7 +90,7 @@ exports.index = function (req, res) {
               version: version,
             });
           }
-        } catch (e) {
+        } catch {
           res.render("index", {
             url: url,
             secret: false,
