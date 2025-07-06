@@ -6,6 +6,7 @@ module.exports = [
     ignores: [
       'public/javascripts/*.js',
       '.github/*',
+      'test/**/*.js',
     ],
     languageOptions: {
       ecmaVersion: 2021,
