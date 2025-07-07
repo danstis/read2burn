@@ -26,3 +26,22 @@ Load the required modules.
 Start the application.
 
     `node app.js`
+
+## Running Tests
+
+Automated tests are located in the `test/` directory and cover core functionality including encryption, database operations, and route handling.
+
+To run all tests:
+
+    `npm test`
+
+Or directly with Jest:
+
+    `npx jest`
+
+Test files:
+
+- `test/crypto.test.js`: Tests for encryption and decryption logic
+- `test/database.test.js`: Tests for NeDB database operations
+- `test/routes-simple.test.js`: Tests for Express route handling
+- `test/setup.js`: Test setup utilities

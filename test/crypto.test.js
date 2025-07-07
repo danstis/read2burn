@@ -3,7 +3,6 @@ const crypto = require('crypto');
 // Test the encryption/decryption functionality similar to routes/index.js
 describe('Crypto functions', () => {
   const CIPHER_ALGORITHM = "aes-256-gcm";
-  const _FILE_KEY_LENGTH = 8;
   const PASSWORD_KEY_LENGTH = 12;
 
   // Helper function from routes/index.js

@@ -1,6 +1,6 @@
-# CLAUDE.md
+# copilot-instructions.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to GitHub Copilot when working with code in this repository.
 
 ## Project Overview
 
@@ -10,8 +10,8 @@ Read2burn is a Node.js application for secure password/secret transportation. It
 
 - **Start application**: `node app.js`
 - **Install dependencies**: `npm install`
-- **Lint code**: `eslint .` (ESLint is available as dev dependency)
-- **Format code**: `prettier .` (Prettier is available as dev dependency)
+- **Lint code**: `npx eslint .` (ESLint is available as dev dependency)
+- **Format code**: `npx prettier .` (Prettier is available as dev dependency)
 - **Run tests**: `npm test` (Jest is used for testing, test files are in `test/`)
 
 ## Architecture Overview
@@ -26,7 +26,7 @@ Read2burn is a Node.js application for secure password/secret transportation. It
 ### Key Configuration
 
 - **Port**: Configurable via `PORT` environment variable (default: 3300)
-- **Cleanup Schedule**: Configurable via `CLEANUP_CRON` environment variable (default: `12 0 * * *` - daily at 00:12)
+- **Cleanup Schedule**: Configurable via `CLEANUP_CRON` environment variable (default: "12 0 * * *" - daily at 00:12)
 - **Secret Expiry**: Configurable via `EXPIRY` environment variable (default: 7776000000ms - 90 days)
 - **Database**: NeDB file-based database at `data/read2burn.db`
 
@@ -48,7 +48,6 @@ Read2burn is a Node.js application for secure password/secret transportation. It
 ### Database Schema
 
 NeDB documents contain:
-
 - `key`: Unique identifier for the secret
 - `timestamp`: Creation timestamp for expiry calculation
 - `encrypted`: AES-256 encrypted secret content
@@ -60,14 +59,6 @@ NeDB documents contain:
 - Uses i18n middleware with locale files in `locales/`
 - Language detection via Accept-Language header
 
-## Important Notes
-
-- No build process required - runs directly with Node.js
-- Database migrations are handled automatically via Umzug on startup
-- Static assets served from `public/` directory
-- EJS templates in `views/` directory (currently only index.ejs)
-- Docker support available via Dockerfile and docker-compose.yml
-
 ## Testing
 
 - Automated tests are located in the `test/` directory.
@@ -77,3 +68,11 @@ NeDB documents contain:
   - `test/database.test.js`: Database operations
   - `test/routes-simple.test.js`: Route handling
   - `test/setup.js`: Test setup utilities
+
+## Important Notes
+
+- No build process required - runs directly with Node.js
+- Database migrations are handled automatically via Umzug on startup
+- Static assets served from `public/` directory
+- EJS templates in `views/` directory (currently only index.ejs)
+- Docker support available via Dockerfile and docker-compose.yml
