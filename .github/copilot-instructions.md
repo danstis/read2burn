@@ -1,6 +1,6 @@
-# GEMINI.md
+# copilot-instructions.md
 
-This file provides guidance to Gemini CLI when working with code in this repository.
+This file provides guidance to GitHub Copilot when working with code in this repository.
 
 ## Project Overview
 

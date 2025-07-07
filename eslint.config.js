@@ -1,11 +1,12 @@
 // ESLint configuration migrated for v9+ (CommonJS syntax, flat config, manual recommended rules)
 
-/** @type {import('eslint').Linter.FlatConfig} */
+/** @type {import('eslint').Linter.Config} */
 module.exports = [
   {
     ignores: [
       'public/javascripts/*.js',
       '.github/*',
+      'test/**/*.js',
     ],
     languageOptions: {
       ecmaVersion: 2021,
