@@ -1,15 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 
-// Ensure test data directory exists
 const testDataDir = path.join(__dirname, '../data');
-if (!fs.existsSync(testDataDir)) {
-  fs.mkdirSync(testDataDir, { recursive: true });
-}
 
 // Clean up test database before each test
 beforeEach(() => {
+  // Ensure the test data directory exists.
+  fs.mkdirSync(testDataDir, { recursive: true });
   const testDbPath = path.join(testDataDir, 'read2burn.db');
+  // Now, safely attempt to remove the file.
   if (fs.existsSync(testDbPath)) {
     fs.unlinkSync(testDbPath);
   }
@@ -17,8 +16,7 @@ beforeEach(() => {
 
 // Clean up any test files after tests
 afterAll(() => {
-  const testDbPath = path.join(testDataDir, 'read2burn.db');
-  if (fs.existsSync(testDbPath)) {
-    fs.unlinkSync(testDbPath);
-  }
+  // Use rmSync to remove the directory and its contents.
+  // The force option prevents an exception if the path does not exist.
+  fs.rmSync(testDataDir, { recursive: true, force: true });
 });
