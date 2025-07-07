@@ -10,9 +10,13 @@ Read2burn is a Node.js application for secure password/secret transportation. It
 
 - **Start application**: `node app.js`
 - **Install dependencies**: `npm install`
-- **Lint code**: `eslint .` (ESLint is available as dev dependency)
-- **Format code**: `prettier .` (Prettier is available as dev dependency)
-- **Run tests**: `npm test` (Jest is used for testing, test files are in `test/`)
+- **Lint code**: `npx eslint .` (ESLint is available as dev dependency)
+- **Format code**: `npx prettier .` (Prettier is available as dev dependency)
+- **Run tests**: `npx jest --coverage` (Jest is used for testing, test files are in `test/`)
+
+## Test Coverage Requirement
+
+- All new code should target at least 60% test coverage.
 
 ## Architecture Overview
 
