@@ -3,7 +3,7 @@
   "version": "0.0.0-development",
   "private": true,
   "dependencies": {
-    "@seald-io/nedb": "^4.1.1",
+    "@seald-io/nedb": "^4.1.2",
     "base-x": "^5.0.1", 
     "bluebird": "^3.7.2",
     "dirty": "^1.1.3",
