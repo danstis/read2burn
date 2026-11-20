@@ -8,7 +8,7 @@ module.exports = [
       '.github/*',
     ],
     languageOptions: {
-      ecmaVersion: 2021,
+      ecmaVersion: 2022,
       sourceType: 'module',
       globals: {
         window: 'readonly',
