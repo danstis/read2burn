@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@seald-io/nedb": "^4.1.2",
-    "base-x": "^5.0.1", 
+    "base-x": "^5.0.1",
     "bluebird": "^3.7.2",
     "dirty": "^1.1.3",
     "ejs": "^3.1.10",
@@ -24,5 +24,8 @@
     "prettier": "^3.6.2"
   },
   "author": "wemove",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  }
 }

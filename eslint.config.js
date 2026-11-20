@@ -20,6 +20,8 @@ module.exports = [
         console: 'readonly',
         Buffer: 'readonly',
         exports: 'writable',
+        fetch: 'readonly',
+        URLSearchParams: 'readonly',
       },
     },
     linterOptions: {
