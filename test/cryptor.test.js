@@ -1,6 +1,12 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const { CryptorFactory, CryptorV2, CryptorV3 } = require('../lib/cryptor');
+const cryptors = require('../lib/cryptor');
+const { CryptorFactory, CryptorV2, CryptorV3 } = cryptors;
+
+// Generated with the V2 implementation before this change using fixed password,
+// IV, and salt. Keep the fixture independent of the current V2 encrypt method.
+const LEGACY_ID = '000000000123456789abcdefghijklmnopqrstuvabcdefghijklmnopqrstuvwxyzABCDEF';
+const LEGACY_CIPHERTEXT = '7e8dfed31872c809bbbb0b3bd599c9ff';
 
 function roundTrip(c, text) {
     c.createKey();
@@ -24,17 +30,15 @@ test('V3 rejects tampering and bad format', () => {
     const flip = (h) => (h[0] === '0' ? '1' : '0') + h.slice(1);
     assert.throws(() => c.decrypt(`${flip(ct)}:${tag}`, id));
     assert.throws(() => c.decrypt(`${ct}:${flip(tag)}`, id));
-    for (const bad of [ct, `${ct}:`, `${ct}:abcd`, `${ct}:${tag}:x`, `zz:${tag}`, undefined]) {
+    for (const bad of [ct, `${ct}:`, `${ct}:abcd`, `${ct}:${tag}:x`, `zz:${tag}`, `abc:${tag}`, `:${tag}`, undefined]) {
         assert.throws(() => c.decrypt(bad, id), /Invalid encrypted payload/);
     }
 });
 
 test('V2 still decrypts legacy ciphertext', () => {
-    const c = new CryptorV2();
-    const { enc, id } = roundTrip(c, 'legacy');
-    assert.strictEqual(id.length, 72);
-    assert.ok(c.validateId(id));
-    assert.strictEqual(new CryptorV2().decrypt(enc, id), 'legacy');
+    assert.strictEqual(LEGACY_ID.length, 72);
+    assert.ok(new CryptorV2().validateId(LEGACY_ID));
+    assert.strictEqual(new CryptorV2().decrypt(LEGACY_CIPHERTEXT, LEGACY_ID), 'legacy V2 entry');
 });
 
 test('factory dispatch', () => {
@@ -42,4 +46,8 @@ test('factory dispatch', () => {
     assert.ok(f.createCurrent() instanceof CryptorV3);
     assert.ok(f.createFromId('a'.repeat(72)) instanceof CryptorV2);
     assert.ok(f.createFromId('a'.repeat(68)) instanceof CryptorV3);
+    for (const invalid of ['a'.repeat(19), 'a'.repeat(70), null, undefined, 123]) {
+        assert.throws(() => f.createFromId(invalid), /Invalid id/);
+    }
+    assert.strictEqual(cryptors.CryptorV1, undefined);
 });

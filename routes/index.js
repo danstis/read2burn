@@ -63,7 +63,14 @@ exports.index = function (req, res) {
             });
         } else if (req.body.id || req.query.id) {
             const id = req.query.id || req.body.id;
-            const crypt = cf.createFromId(id);
+            let crypt;
+            try {
+                crypt = cf.createFromId(id);
+            } catch {
+                res.status(422);
+                res.send('Invalid argument.');
+                return;
+            }
             if (!crypt.validateId(id)) {
                 res.status(422);
                 res.send('Invalid argument.');
