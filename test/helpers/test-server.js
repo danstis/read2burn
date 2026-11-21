@@ -48,6 +48,7 @@ async function startServer(env = {}) {
   }).finally(() => clearTimeout(timer));
   const base = `http://127.0.0.1:${port}`;
   return {
+    dir,
     base,
     dir,
     stderr: () => err,

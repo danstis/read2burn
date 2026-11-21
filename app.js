@@ -24,8 +24,9 @@ app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 app.use(express.Router());
 app.use(express.static(path.join(__dirname, "public")));
-const parsedMax = Number.parseInt(process.env.READ2BURN_MAX_SECRET_CHARS, 10);
-const maxSecretChars = parsedMax > 0 ? parsedMax : 4000;
+const rawMax = process.env.READ2BURN_MAX_SECRET_CHARS;
+const parsedMax = /^\d+$/.test(rawMax || "") ? Number(rawMax) : 0;
+const maxSecretChars = Number.isSafeInteger(parsedMax * 12 + 8192) && parsedMax > 0 ? parsedMax : 4000;
 app.locals.maxSecretChars = maxSecretChars;
 app.locals.maxSecretCharsWarning = Math.max(maxSecretChars - 10, 0);
 // URL-encoding can expand each char up to 12 bytes (4-byte UTF-8 as %XX), plus form overhead

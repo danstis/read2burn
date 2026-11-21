@@ -1,5 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const { startServer } = require('./helpers/test-server');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -74,10 +76,40 @@ test('rendered page includes configured limits', async () => {
   assert.match(html, /'maxCharsWarning': 3990,/);
 });
 
+const dbCount = (s) => {
+  const db = path.join(s.dir, 'data', 'read2burn.db');
+  return fs.existsSync(db) ? fs.readFileSync(db, 'utf8').split('\n').filter((l) => l.includes('"encrypted"')).length : 0;
+};
+
 test('oversized secret returns 413 and is not stored', async () => {
+  const before = dbCount(srv);
   const res = await srv.post('/', { secret: 'a'.repeat(4001) });
   assert.equal(res.status, 413);
   assert.equal(await res.text(), 'Argument too large.');
+  assert.equal(dbCount(srv), before);
+});
+
+test('duplicate secret fields return 400 and server survives', async () => {
+  const res = await fetch(srv.base + '/', {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: 'secret=a&secret=b',
+  });
+  assert.equal(res.status, 400);
+  assert.equal((await srv.get('/')).status, 200);
+});
+
+test('duplicate id returns 422', async () => {
+  assert.equal((await srv.get('/?id=a&id=b')).status, 422);
+});
+
+test('invalid limit values fall back to 4000', async () => {
+  for (const v of ['0', '-5', 'abc', '10abc']) {
+    const s = await startServer({ READ2BURN_MAX_SECRET_CHARS: v });
+    try {
+      assert.match(await (await s.get('/')).text(), /'maxChars': 4000,/);
+    } finally { await s.stop(); }
+  }
 });
 
 test('secret at the limit succeeds', async () => {
@@ -90,6 +122,8 @@ test('custom limit is honoured and rendered', async () => {
   try {
     assert.equal((await s2.post('/', { secret: 'a'.repeat(10) })).status, 200);
     assert.equal((await s2.post('/', { secret: 'a'.repeat(11) })).status, 413);
-    assert.match(await (await s2.get('/')).text(), /'maxChars': 10,/);
+    const html = await (await s2.get('/')).text();
+    assert.match(html, /'maxChars': 10,/);
+    assert.match(html, /'maxCharsWarning': 0,/);
   } finally { await s2.stop(); }
 });
