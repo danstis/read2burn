@@ -35,7 +35,11 @@ FROM node:lts-alpine
 ENV READ2BURN_HOME="/app" \
     READ2BURN_PUBLIC_URL=""
 WORKDIR ${READ2BURN_HOME}
-COPY --from=builder ${READ2BURN_HOME} .
+RUN mkdir -p ${READ2BURN_HOME}/data && chown -R node:node ${READ2BURN_HOME}
+COPY --from=builder --chown=node:node ${READ2BURN_HOME} .
+# The official node image defines the named user; keep it readable here.
+# hadolint ignore=DL3066
+USER node
 EXPOSE 3300
 VOLUME ["${READ2BURN_HOME}/data"]
 CMD ["node", "app.js"]
