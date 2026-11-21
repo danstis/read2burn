@@ -81,7 +81,7 @@ nedb.autoloadPromise
     });
   })
   .catch(function (err) {
-    console.error("Startup failed:", err);
+    console.error("Migration failed:", err);
     process.exit(1);
   });
 
