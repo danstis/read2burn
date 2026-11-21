@@ -17,7 +17,6 @@ jobs:
   sonarcloud:
     name: SonarCloud Scan
     runs-on: ubuntu-latest
-    continue-on-error: true
     needs: [test]
     steps:
       - name: Check out code
@@ -50,6 +49,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectVersion=${{ steps.gitversion.outputs.FullSemVer }}
+            -Dsonar.qualitygate.wait=true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
