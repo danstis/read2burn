@@ -8,9 +8,9 @@ WORKDIR /tmp
 
 # hadolint ignore=DL3018
 COPY ./package* /tmp
-RUN npm install --ignore-scripts
+RUN npm ci --ignore-scripts
 # hadolint ignore=DL3059
-RUN	npm version ${BUILD} --allow-same-version &&\
+RUN	npm version "${BUILD}" --allow-same-version &&\
 	npx genversion version.js
 
 ####################
