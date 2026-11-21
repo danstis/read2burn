@@ -21,7 +21,7 @@ function freePort() {
 async function startServer(env = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'r2b-'));
   const port = await freePort();
-  const child = spawn(process.execPath, [APP], {
+  const child = spawn(process.execPath, ['--require', path.join(__dirname, 'graceful-exit.js'), APP], {
     cwd: dir,
     env: { ...process.env, PORT: String(port), ...env },
     stdio: ['ignore', 'pipe', 'inherit'],
