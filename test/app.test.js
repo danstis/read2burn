@@ -67,3 +67,17 @@ test('migrations run on startup and record state (failure must not be silent)', 
   }
   assert.ok(fs.existsSync(f));
 });
+
+test('concurrent reveals: exactly one wins', async () => {
+  const id = extractId(await (await srv.post('/', { secret: 'race secret' })).text());
+  const bodies = await Promise.all(
+    Array.from({ length: 10 }, () => srv.post('/', { id, show: 'true' }).then((r) => r.text()))
+  );
+  assert.equal(bodies.filter((b) => b.includes('race secret')).length, 1);
+});
+
+test('unknown id shows no entry', async () => {
+  const id = extractId(await (await srv.post('/', { secret: 'x' })).text());
+  await srv.post('/', { id, show: 'true' });
+  assert.ok((await (await srv.get(`/?id=${id}`)).text()).includes('No entry found!'));
+});
