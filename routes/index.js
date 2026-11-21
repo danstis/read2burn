@@ -48,7 +48,7 @@ exports.index = function (req, res) {
                     res.send('Unexpected server error.');
                     return;
                 }
-                const timestamp = new Date().getTime();
+                const timestamp = Date.now();
                 const encrypted = cryptor.encrypt(secret);
                 const entry = { key, timestamp, encrypted };
                 nedb.insert(entry, function (err) {
