@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: false }));
 app.enable("trust proxy");
 app.disable("x-powered-by");
 
-const nedb = new Datastore({ filename: "data/read2burn.db", autoload: true });
+const nedb = new Datastore({ filename: process.env.READ2BURN_DB_FILE || "data/read2burn.db", autoload: true });
 const umzug = new Umzug({
   storage: new JSONStorage({ path: 'data/migrations.json' }),
   context: nedb,
