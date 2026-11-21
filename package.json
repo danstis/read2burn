@@ -21,7 +21,7 @@
   "main": "app.js",
   "devDependencies": {
     "eslint": "^9.39.1",
-    "prettier": "^3.6.2"
+    "prettier": "^3.10.1"
   },
   "author": "wemove",
   "license": "MIT",
