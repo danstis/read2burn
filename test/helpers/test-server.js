@@ -29,12 +29,12 @@ async function startServer(env = {}) {
   const exited = new Promise((r) => child.once('close', r));
   let out = '';
   let err = '';
+  child.stderr.on('data', (d) => { err += d; });
   let timer;
   await new Promise((resolve, reject) => {
-    timer = setTimeout(() => reject(new Error(`server start timeout; output: ${out}`)), 15000);
+    timer = setTimeout(() => reject(new Error(`server start timeout; output: ${out} stderr: ${err}`)), 15000);
     child.once('error', reject);
-    void exited.then((c) => reject(new Error(`server exited early (${c}); output: ${out}; error: ${err}`)));
-    child.stderr.on('data', (d) => { err += d; });
+    void exited.then((c) => reject(new Error(`server exited early (${c}); output: ${out} stderr: ${err}`)));
     child.stdout.on('data', (d) => {
       out += d;
       if (/listening on port/.test(out)) {
@@ -49,6 +49,8 @@ async function startServer(env = {}) {
   const base = `http://127.0.0.1:${port}`;
   return {
     base,
+    dir,
+    stderr: () => err,
     get: (p) => fetch(base + p),
     post: (p, form) =>
       fetch(base + p, {

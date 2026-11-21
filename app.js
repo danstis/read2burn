@@ -4,10 +4,11 @@
 const { Umzug, JSONStorage } = require("umzug");
 const express = require("express"),
   routes = require("./routes"),
-  http = require("http"),
-  path = require("path"),
+  http = require("node:http"),
+  path = require("node:path"),
   cron = require("node-cron"),
   Datastore = require("@seald-io/nedb"),
+  { cleanupExpired } = require("./lib/cleanup"),
   version = require("./version");
 
 const { URL } = require("node:url");
@@ -55,7 +56,7 @@ const nedb = new Datastore({ filename: "data/read2burn.db", autoload: true });
 const umzug = new Umzug({
   storage: new JSONStorage({ path: 'data/migrations.json' }),
   context: nedb,
-  migrations: { glob: 'migrations/*.js' },
+  migrations: { glob: path.join(__dirname, 'migrations/*.js').split(path.sep).join('/') },
 });
 
 module.exports.nedb = nedb;
@@ -69,29 +70,41 @@ i18n.configure({
 app.get("/", routes.index);
 app.post("/", routes.index);
 
-umzug.up().then(function () {
-  // migrations will be an Array with the names of the
-  // executed migrations.
+// never leak stack traces (e.g. body-parser 413/400) to clients
+const ERROR_MESSAGES = { 413: "Argument too large.", 500: "Unexpected server error." };
+app.use(function (err, req, res, next) {
+  if (res.headersSent) {
+    return next(err);
+  }
+  const status = err.status >= 400 && err.status < 500 ? err.status : 500;
+  res.status(status).send(ERROR_MESSAGES[status] || "Bad request.");
 });
 
-// start server
-http.createServer(app).listen(app.get("port"), function () {
-  console.log("Express server listening on port " + app.get("port"));
-});
+// migrations must finish before we accept requests; a failure must be loud, never a silent half-upgrade
+umzug
+  .up()
+  .then(function () {
+    http.createServer(app).listen(app.get("port"), function () {
+      console.log("Express server listening on port " + app.get("port"));
+    });
+
+    // schedule regular cleanup (only once migrations are done)
+    const schedule = String(app.get("cleanupcron"));
+    cron.schedule(schedule, function () {
+      console.log("Cleanup proceeding...");
+      cleanupExpired(nedb, app.get("expirytime"), function (err, numDeleted) {
+        if (err) {
+          console.error("Cleanup failed:", err);
+          return;
+        }
+        console.log("Deleted", numDeleted, "entries");
+        nedb.persistence.compactDatafile();
+      });
+    });
+  })
+  .catch(function (err) {
+    console.error("Migration failed:", err);
+    process.exit(1);
+  });
 
 console.log("Version: " + version);
-
-// schedule regular cleanup
-const schedule = String(app.get("cleanupcron"));
-cron.schedule(schedule, function () {
-  console.log("Cleanup proceeding...");
-  const expireTime = new Date().getTime() - app.get("expirytime"); // Expire secrets after expirytime
-  nedb.remove(
-    { timestamp: { $lte: expireTime } },
-    { multi: true },
-    function (err, numDeleted) {
-      console.log("Deleted", numDeleted, "entries");
-      nedb.persistence.compactDatafile();
-    }
-  );
-});

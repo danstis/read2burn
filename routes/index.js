@@ -57,7 +57,7 @@ exports.index = function (req, res) {
                     res.send('Unexpected server error.');
                     return;
                 }
-                const timestamp = new Date().getTime();
+                const timestamp = Date.now();
                 const encrypted = cryptor.encrypt(secret);
                 const entry = { key, timestamp, encrypted };
                 nedb.insert(entry, function (err) {
@@ -70,16 +70,16 @@ exports.index = function (req, res) {
                     res.render('index', { url: url, secret: secret, error: undefined, found: false, version: version });
                 });
             });
-            // parameter 'key' is deprecated, remove related code after 01.01.2025
-        } else if (req.query.key || req.body.id || req.query.id) {
-            let id = req.query.key;
-            if (!id) {
-                id = req.query.id;
+        } else if (req.body.id || req.query.id) {
+            const id = req.query.id || req.body.id;
+            let crypt;
+            try {
+                crypt = cf.createFromId(id);
+            } catch {
+                res.status(422);
+                res.send('Invalid argument.');
+                return;
             }
-            if (!id) {
-                id = req.body.id;
-            }
-            const crypt = cf.createFromId(id);
             if (!crypt.validateId(id)) {
                 res.status(422);
                 res.send('Invalid argument.');
