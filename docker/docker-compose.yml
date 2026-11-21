@@ -11,3 +11,4 @@ services:
       - ./data:/app/data
 #    environment:
 #      - REL_PATH=/r2b
+#      - READ2BURN_PUBLIC_URL=https://read2burn.example.com/read2burn

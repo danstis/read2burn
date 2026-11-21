@@ -12,7 +12,7 @@ docker push danstis/read2burn:<VERSION>
 ## Run the docker
 
 ```bash
-docker run --restart=always -d -p 3300:3300 --volume=/opt/read2burn/data:/app/data -e REL_PATH=<RELATIVE PATH, IE '/r2b'> --name read2burn danstis/read2burn:<VERSION>
+docker run --restart=always -d -p 3300:3300 --volume=/opt/read2burn/data:/app/data -e REL_PATH=<RELATIVE PATH, IE '/r2b'> -e READ2BURN_PUBLIC_URL=<PUBLIC URL, OPTIONAL> --name read2burn danstis/read2burn:<VERSION>
 ```
 
 ## Apache config for sub paths
@@ -27,3 +27,12 @@ RewriteRule ^/r2b$ %{HTTPS_HOST}/r2b/ [R=permanent,L]
   RequestHeader set X-Forwarded-Ssl on
 </Location>
 ```
+
+## Canonical share URL
+
+Set `READ2BURN_PUBLIC_URL` to force generated share links to use a fixed base URL, ignoring the request `Host` / `X-Forwarded-*` headers (prevents Host Header Injection). Must be an absolute `http(s)` URL; query and hash are dropped.
+
+- Root path: `READ2BURN_PUBLIC_URL=https://read2burn.example.com`
+- Sub path: `READ2BURN_PUBLIC_URL=https://read2burn.example.com/read2burn`
+
+When unset, links are built from the request headers.

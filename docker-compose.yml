@@ -14,3 +14,4 @@ services:
       - CLEANUP_CRON=* * * * *
       - EXPIRY=60000
       # - REL_PATH=/r2b
+      # - READ2BURN_PUBLIC_URL=https://read2burn.example.com/read2burn

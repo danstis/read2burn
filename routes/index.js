@@ -2,9 +2,18 @@
  * GET home page.
  */
 
+const { URL } = require('node:url');
 const app = require('../app');
 const { CryptorFactory } = require('../lib/cryptor');
 const version = require('../version');
+
+function buildShareUrl(req, id) {
+    const base = app.publicBaseUrl;
+    if (base) {
+        return new URL(`?id=${id}`, base).href;
+    }
+    return `${req.protocol}://${req.get('host')}/?id=${id}`;
+}
 
 exports.index = function (req, res) {
     try {
@@ -57,7 +66,7 @@ exports.index = function (req, res) {
                         res.send('Failed to save secret.');
                         return;
                     }
-                    url = `${req.protocol}://${req.get('host')}/?id=${cryptor.getId()}`;
+                    url = buildShareUrl(req, cryptor.getId());
                     res.render('index', { url: url, secret: secret, error: undefined, found: false, version: version });
                 });
             });
