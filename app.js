@@ -4,8 +4,8 @@
 const { Umzug, JSONStorage } = require("umzug");
 const express = require("express"),
   routes = require("./routes"),
-  http = require("http"),
-  path = require("path"),
+  http = require("node:http"),
+  path = require("node:path"),
   cron = require("node-cron"),
   Datastore = require("@seald-io/nedb"),
   { cleanupExpired } = require("./lib/cleanup"),
@@ -47,12 +47,13 @@ app.get("/", routes.index);
 app.post("/", routes.index);
 
 // never leak stack traces (e.g. body-parser 413/400) to clients
+const ERROR_MESSAGES = { 413: "Argument too large.", 500: "Unexpected server error." };
 app.use(function (err, req, res, next) {
   if (res.headersSent) {
     return next(err);
   }
   const status = err.status >= 400 && err.status < 500 ? err.status : 500;
-  res.status(status).send(status === 413 ? "Argument too large." : status === 500 ? "Unexpected server error." : "Bad request.");
+  res.status(status).send(ERROR_MESSAGES[status] || "Bad request.");
 });
 
 // migrations must finish before we accept requests; a failure must be loud, never a silent half-upgrade

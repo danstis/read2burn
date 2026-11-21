@@ -22,9 +22,12 @@ test.after(() => {
 });
 
 test('missing legacy dir is a no-op (fresh install)', async () => {
-  process.env.LEGACY_DATA_DIR = path.join(tmp(), 'nope');
+  const missing = (process.env.LEGACY_DATA_DIR = path.join(tmp(), 'nope'));
   await require('../migrations/01_migrate_data_directories').up();
-  await require('../migrations/02_migrate2nedb').up({ context: new Datastore() });
+  const db = new Datastore();
+  await require('../migrations/02_migrate2nedb').up({ context: db });
+  assert.ok(!fs.existsSync(missing));
+  assert.equal((await db.findAsync({})).length, 0);
 });
 
 test('01 shortens long legacy dir names to 3 chars (resolves only after the move)', async () => {
