@@ -70,10 +70,11 @@ test('migrations run on startup and record state (failure must not be silent)', 
 
 test('concurrent reveals: exactly one wins', async () => {
   const id = extractId(await (await srv.post('/', { secret: 'race secret' })).text());
-  const bodies = await Promise.all(
-    Array.from({ length: 10 }, () => srv.post('/', { id, show: 'true' }).then((r) => r.text()))
-  );
+  const responses = await Promise.all(Array.from({ length: 10 }, () => srv.post('/', { id, show: 'true' })));
+  const bodies = await Promise.all(responses.map((response) => response.text()));
+  responses.forEach((response) => assert.equal(response.status, 200));
   assert.equal(bodies.filter((b) => b.includes('race secret')).length, 1);
+  assert.equal(bodies.filter((b) => b.includes('No entry found!')).length, bodies.length - 1);
 });
 
 test('unknown id shows no entry', async () => {
