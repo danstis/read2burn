@@ -32,7 +32,7 @@ async function startServer(env = {}) {
   await new Promise((resolve, reject) => {
     timer = setTimeout(() => reject(new Error(`server start timeout; output: ${out}`)), 15000);
     child.once('error', reject);
-    exited.then((c) => reject(new Error(`server exited early (${c}); output: ${out}`)));
+    void exited.then((c) => reject(new Error(`server exited early (${c}); output: ${out}`)));
     child.stdout.on('data', (d) => {
       out += d;
       if (/listening on port/.test(out)) {
