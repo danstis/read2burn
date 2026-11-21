@@ -15,7 +15,10 @@ exports.index = function (req, res) {
         const cf = new CryptorFactory();
 
         if (req.body.secret) {
-            if (req.body.secret.length > req.app.locals.maxSecretChars) {
+            if (typeof req.body.secret !== 'string') {
+                return res.status(400).send('Invalid argument.');
+            }
+            if (req.body.secret.length > (req.app?.locals?.maxSecretChars ?? 4000)) {
                 return res.status(413).send('Argument too large.');
             }
             const cryptor = cf.createCurrent();
