@@ -21,10 +21,9 @@
   "main": "app.js",
   "scripts": {
     "test": "node --test test/*.test.js",
-    "coverage": "c8 --reporter=lcov --reporter=text --include='lib/**' --include='routes/**' --include='app.js' npm test"
+    "test:coverage": "mkdir -p coverage && node --test --experimental-test-coverage --test-coverage-include=app.js --test-coverage-include='lib/**' --test-coverage-include='routes/**' --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info test/*.test.js"
   },
   "devDependencies": {
-    "c8": "^10.1.3",
     "eslint": "^9.39.1",
     "prettier": "^3.6.2"
   },

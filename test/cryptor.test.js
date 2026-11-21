@@ -19,6 +19,7 @@ test('V3 round trip', () => {
     const { enc, id } = roundTrip(c, 'héllo secret');
     assert.strictEqual(id.length, 68);
     assert.ok(c.validateId(id));
+    assert.equal(c.parseKey(id), c.key);
     assert.match(enc, /^[0-9a-f]*:[0-9a-f]{32}$/);
     assert.strictEqual(new CryptorV3().decrypt(enc, id), 'héllo secret');
 });
@@ -39,6 +40,13 @@ test('V2 still decrypts legacy ciphertext', () => {
     assert.strictEqual(LEGACY_ID.length, 72);
     assert.ok(new CryptorV2().validateId(LEGACY_ID));
     assert.strictEqual(new CryptorV2().decrypt(LEGACY_CIPHERTEXT, LEGACY_ID), 'legacy V2 entry');
+});
+
+test('validateId rejects malformed ids', () => {
+    assert.ok(!new CryptorV3().validateId('short'));
+    assert.ok(!new CryptorV3().validateId('!'.repeat(68)));
+    assert.ok(!new CryptorV2().validateId('short'));
+    assert.ok(!new CryptorV2().validateId('!'.repeat(72)));
 });
 
 test('factory dispatch', () => {
