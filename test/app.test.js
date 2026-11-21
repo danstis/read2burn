@@ -1,7 +1,5 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
 const { startServer } = require('./helpers/test-server');
 const fs = require('node:fs');
 const path = require('node:path');
