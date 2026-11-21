@@ -24,15 +24,17 @@ async function startServer(env = {}) {
   const child = spawn(process.execPath, ['--require', path.join(__dirname, 'graceful-exit.js'), APP], {
     cwd: dir,
     env: { ...process.env, PORT: String(port), ...env },
-    stdio: ['ignore', 'pipe', 'inherit'],
+    stdio: ['ignore', 'pipe', 'pipe'],
   });
-  const exited = new Promise((r) => child.once('exit', r));
+  const exited = new Promise((r) => child.once('close', r));
   let out = '';
+  let err = '';
   let timer;
   await new Promise((resolve, reject) => {
     timer = setTimeout(() => reject(new Error(`server start timeout; output: ${out}`)), 15000);
     child.once('error', reject);
-    void exited.then((c) => reject(new Error(`server exited early (${c}); output: ${out}`)));
+    void exited.then((c) => reject(new Error(`server exited early (${c}); output: ${out}; error: ${err}`)));
+    child.stderr.on('data', (d) => { err += d; });
     child.stdout.on('data', (d) => {
       out += d;
       if (/listening on port/.test(out)) {
