@@ -22,36 +22,15 @@ exports.index = function (req, res) {
             const cryptor = cf.createCurrent();
             const secret = req.body.secret;
 
-            // Helper function to generate a unique key asynchronously
-            function generateUniqueKey(callback) {
+            const MAX_INSERT_RETRIES = 10;
+            // Unique index on key makes insert atomic; retry with a fresh key on collision.
+            const tryInsert = function (attempt) {
                 const key = cryptor.createKey();
-                nedb.findOne({ key }, function (err, doc) {
-                    if (err) {
-                        // Handle the error appropriately, e.g., log and return
-                        console.error('Error during findOne in generateUniqueKey:', err);
-                        return callback(null);
-                    }
-                    if (doc) {
-                        // Key exists, try again
-                        generateUniqueKey(callback);
-                    } else {
-                        // Key is unique
-                        callback(key);
-                    }
-                });
-            }
-
-            generateUniqueKey(function (key) {
-                if (!key) {
-                    // Error occurred during key generation
-                    res.status(500);
-                    res.send('Unexpected server error.');
-                    return;
-                }
-                const timestamp = Date.now();
                 const encrypted = cryptor.encrypt(secret);
-                const entry = { key, timestamp, encrypted };
-                nedb.insert(entry, function (err) {
+                nedb.insert({ key, timestamp: Date.now(), encrypted }, function (err) {
+                    if (err && err.errorType === 'uniqueViolated' && attempt < MAX_INSERT_RETRIES) {
+                        return tryInsert(attempt + 1);
+                    }
                     if (err) {
                         res.status(500);
                         res.send('Failed to save secret.');
@@ -60,7 +39,8 @@ exports.index = function (req, res) {
                     url = `${req.protocol}://${req.get('host')}/?id=${cryptor.getId()}`;
                     res.render('index', { url: url, secret: secret, error: undefined, found: false, version: version });
                 });
-            });
+            };
+            tryInsert(1);
         } else if (req.body.id || req.query.id) {
             const id = req.query.id || req.body.id;
             let crypt;

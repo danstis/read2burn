@@ -18,8 +18,11 @@ function freePort() {
   });
 }
 
-async function startServer(env = {}) {
+async function startServer(env = {}, seed) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'r2b-'));
+  if (seed) {
+    seed(dir); // e.g. pre-populate data/ before the app boots
+  }
   const port = await freePort();
   const child = spawn(process.execPath, ['--require', path.join(__dirname, 'graceful-exit.js'), APP], {
     cwd: dir,
