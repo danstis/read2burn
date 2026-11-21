@@ -15,9 +15,8 @@ exports.index = function (req, res) {
         const cf = new CryptorFactory();
 
         if (req.body.secret) {
-            if (req.body.secret.length > 10000000) {
-                res.status(413);
-                res.send('Argument too large.');
+            if (req.body.secret.length > req.app.locals.maxSecretChars) {
+                return res.status(413).send('Argument too large.');
             }
             const cryptor = cf.createCurrent();
             const secret = req.body.secret;
@@ -72,8 +71,7 @@ exports.index = function (req, res) {
                 return;
             }
             if (!crypt.validateId(id)) {
-                res.status(422);
-                res.send('Invalid argument.');
+                return res.status(422).send('Invalid argument.');
             } else {
                 const key = crypt.parseKey(id);
                 nedb.findOne({ key }, function (err, doc) {
