@@ -1,85 +1,69 @@
 "use strict";
 
-var Bluebird = require("bluebird");
-var fs = require("extfs");
-var rimraf = require("rimraf");
-var path = require("path");
-var mv = require("mv");
-const dir = path.resolve(__dirname, "../data");
+const Bluebird = require("bluebird");
+const fs = require("extfs");
+const { rimraf } = require("rimraf");
+const path = require("node:path");
+const mv = require("mv");
+const { promisify } = require("node:util");
+const { series } = require("../lib/series");
+
+const mvAsync = promisify(mv);
+const legacyDir = () => process.env.LEGACY_DATA_DIR || path.resolve(__dirname, "../data");
+
+async function removeEmptyDir(dirPath) {
+  await rimraf(dirPath);
+  console.log("Removed empty directory:  " + dirPath);
+}
+
+async function moveDirectory(from, to) {
+  await mvAsync(from, to);
+  console.log('Moved directory "' + from + '" -> "' + to + '"');
+}
+
+async function moveFile(from, to) {
+  if (fs.existsSync(to)) {
+    console.warn("File '" + to + "' exists. Overwriting it!");
+  }
+  await mvAsync(from, to);
+  console.log('Moved file "' + from + '" -> "' + to + '"');
+}
+
+// Move all files into the already existing shortened directory, one by one, then drop the emptied one.
+async function mergeDirectory(from, to) {
+  await series(fs.readdirSync(from), (file) => moveFile(path.resolve(from, file), path.join(to, file)));
+  if (fs.isEmptySync(from)) {
+    await removeEmptyDir(from);
+  }
+}
+
+async function migrateEntry(dir, it) {
+  const itsPath = path.resolve(dir, it);
+  if (!fs.statSync(itsPath).isDirectory()) {
+    return;
+  }
+  if (fs.isEmptySync(itsPath)) {
+    return removeEmptyDir(itsPath);
+  }
+  const lastPath = path.basename(itsPath);
+  if (lastPath.length <= 3) {
+    return;
+  }
+  const shortendPath = itsPath.replace(lastPath, lastPath.substr(0, 3));
+  return fs.existsSync(shortendPath) ? mergeDirectory(itsPath, shortendPath) : moveDirectory(itsPath, shortendPath);
+}
 
 module.exports = {
-  up: function () {
-    return new Bluebird(function (resolve) {
-      console.log(
-        "MIGRATION 01_migrate_data_directories.js: Migrating old long data directories to 3 character directories."
-      );
-      // Describe how to achieve the task.
-      // rename data directories to the 3 characters
-
-      fs.readdirSync(dir).forEach((it) => {
-        const itsPath = path.resolve(dir, it);
-        const itsStat = fs.statSync(itsPath);
-
-        if (itsStat.isDirectory()) {
-          if (fs.isEmptySync(itsPath)) {
-            rimraf(itsPath, function () {
-              console.log("Removed empty directory:  " + itsPath);
-            });
-          } else {
-            var lastPath = path.basename(itsPath);
-            if (lastPath.length > 3) {
-              var shortendPath = itsPath.replace(
-                lastPath,
-                lastPath.substr(0, 3)
-              );
-              if (fs.existsSync(shortendPath)) {
-                // Move all file to shortend path
-                fs.readdirSync(itsPath).forEach((it) => {
-                  var srcPath = path.resolve(itsPath, it);
-                  var dstPath = path.join(shortendPath, path.basename(srcPath));
-                  if (fs.existsSync(dstPath)) {
-                    console.warn(
-                      "File '" + dstPath + "' exists. Overwriting it!"
-                    );
-                  }
-                  mv(srcPath, dstPath, function (err) {
-                    console.log(
-                      'Moved file "' + srcPath + '" -> "' + dstPath + '"'
-                    );
-
-                    // done. it tried fs.rename first, and then falls back to
-                    // piping the source file to the dest file and then unlinking
-                    // the source file.
-                    if (err) {console.log(err);}
-                  });
-                });
-                if (fs.isEmptySync(itsPath)) {
-                  rimraf(itsPath, function () {
-                    console.log("Removed empty directory:  " + itsPath);
-                  });
-                }
-              } else {
-                mv(itsPath, shortendPath, function (err) {
-                  // done. it tried fs.rename first, and then falls back to
-                  // piping the source file to the dest file and then unlinking
-                  // the source file.
-                  console.log(
-                    'Moved directory "' +
-                      itsPath +
-                      '" -> "' +
-                      shortendPath +
-                      '"'
-                  );
-                  if (err) {console.log(err);}
-                });
-              }
-            }
-          }
-        }
-      });
-      // Call resolve/reject at some point.
-      resolve();
-    });
+  up: async function () {
+    console.log(
+      "MIGRATION 01_migrate_data_directories.js: Migrating old long data directories to 3 character directories."
+    );
+    // rename data directories to the 3 characters, strictly one entry at a time
+    const dir = legacyDir();
+    if (!fs.existsSync(dir)) {
+      return; // fresh install: nothing to migrate
+    }
+    await series(fs.readdirSync(dir), (it) => migrateEntry(dir, it));
   },
 
   down: function () {

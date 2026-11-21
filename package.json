@@ -21,7 +21,7 @@
   "main": "app.js",
   "scripts": {
     "test": "node --test test/*.test.js",
-    "test:coverage": "mkdir -p coverage && node --test --experimental-test-coverage --test-coverage-include=app.js --test-coverage-include='lib/**' --test-coverage-include='routes/**' --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info test/*.test.js"
+    "test:coverage": "mkdir -p coverage && node --test --experimental-test-coverage --test-coverage-include=app.js --test-coverage-include='lib/**' --test-coverage-include='routes/**' --test-coverage-include='migrations/**' --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info test/*.test.js"
   },
   "devDependencies": {
     "eslint": "^9.39.1",
