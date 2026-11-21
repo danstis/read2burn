@@ -26,12 +26,22 @@ async function startServer(env = {}) {
     env: { ...process.env, PORT: String(port), ...env },
     stdio: ['ignore', 'pipe', 'inherit'],
   });
+  const exited = new Promise((r) => child.once('exit', r));
+  let out = '';
+  let timer;
   await new Promise((resolve, reject) => {
+    timer = setTimeout(() => reject(new Error(`server start timeout; output: ${out}`)), 15000);
     child.once('error', reject);
-    child.once('exit', (c) => reject(new Error(`server exited early (${c})`)));
-    child.stdout.on('data', (d) => /listening on port/.test(d) && resolve());
-  });
-  child.removeAllListeners('exit');
+    exited.then((c) => reject(new Error(`server exited early (${c}); output: ${out}`)));
+    child.stdout.on('data', (d) => {
+      out += d;
+      if (/listening on port/.test(out)) resolve();
+    });
+  }).catch((e) => {
+    child.kill();
+    fs.rmSync(dir, { recursive: true, force: true });
+    throw e;
+  }).finally(() => clearTimeout(timer));
   const base = `http://127.0.0.1:${port}`;
   return {
     base,
@@ -43,7 +53,6 @@ async function startServer(env = {}) {
         body: new URLSearchParams(form),
       }),
     async stop() {
-      const exited = new Promise((r) => child.once('exit', r));
       child.kill();
       await exited;
       fs.rmSync(dir, { recursive: true, force: true });

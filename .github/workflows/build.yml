@@ -83,7 +83,7 @@ jobs:
           node-version: lts/*
 
       - name: Install Node.js dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Run tests
         run: npm test
