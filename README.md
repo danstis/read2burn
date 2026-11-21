@@ -26,3 +26,9 @@ Load the required modules.
 Start the application.
 
     `node app.js`
+
+## Configuration
+
+| Variable | Default | Description |
+|---|---|---|
+| `READ2BURN_MAX_SECRET_CHARS` | `4000` | Maximum number of characters in a secret. Invalid or non-positive values fall back to the default. |

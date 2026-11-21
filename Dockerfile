@@ -32,7 +32,8 @@ RUN rm -rf ${READ2BURN_HOME}/docker
 ####################
 # Create image
 FROM node:lts-alpine
-ENV READ2BURN_HOME="/app"
+ENV READ2BURN_HOME="/app" \
+    READ2BURN_MAX_SECRET_CHARS=4000
 WORKDIR ${READ2BURN_HOME}
 RUN mkdir -p ${READ2BURN_HOME}/data && chown -R node:node ${READ2BURN_HOME}
 COPY --from=builder --chown=node:node ${READ2BURN_HOME} .

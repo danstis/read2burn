@@ -67,3 +67,29 @@ test('migrations run on startup and record state (failure must not be silent)', 
   }
   assert.ok(fs.existsSync(f));
 });
+
+test('rendered page includes configured limits', async () => {
+  const html = await (await srv.get('/')).text();
+  assert.match(html, /'maxChars': 4000,/);
+  assert.match(html, /'maxCharsWarning': 3990,/);
+});
+
+test('oversized secret returns 413 and is not stored', async () => {
+  const res = await srv.post('/', { secret: 'a'.repeat(4001) });
+  assert.equal(res.status, 413);
+  assert.equal(await res.text(), 'Argument too large.');
+});
+
+test('secret at the limit succeeds', async () => {
+  const res = await srv.post('/', { secret: 'a'.repeat(4000) });
+  assert.equal(res.status, 200);
+});
+
+test('custom limit is honoured and rendered', async () => {
+  const s2 = await startServer({ READ2BURN_MAX_SECRET_CHARS: '10' });
+  try {
+    assert.equal((await s2.post('/', { secret: 'a'.repeat(10) })).status, 200);
+    assert.equal((await s2.post('/', { secret: 'a'.repeat(11) })).status, 413);
+    assert.match(await (await s2.get('/')).text(), /'maxChars': 10,/);
+  } finally { await s2.stop(); }
+});

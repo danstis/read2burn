@@ -14,4 +14,5 @@ services:
     environment:
       - CLEANUP_CRON=* * * * *
       - EXPIRY=60000
+      # - READ2BURN_MAX_SECRET_CHARS=4000
       # - REL_PATH=/r2b
