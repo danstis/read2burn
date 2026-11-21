@@ -21,7 +21,7 @@
   "main": "app.js",
   "scripts": {
     "test": "node --test test/*.test.js",
-    "coverage": "c8 --reporter=lcov --reporter=text --include=lib/cryptor.js npm test"
+    "coverage": "c8 --reporter=lcov --reporter=text --include='lib/**' --include='routes/**' --include='app.js' npm test"
   },
   "devDependencies": {
     "c8": "^10.1.3",
