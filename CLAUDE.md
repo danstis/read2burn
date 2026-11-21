@@ -31,7 +31,7 @@ Read2burn is a Node.js application for secure password/secret transportation. It
 
 ### Security Implementation
 
-- **Encryption**: AES-256 cipher with random IV for each secret
+- **Encryption**: AES-256-GCM (authenticated) for new secrets; legacy AES-256-CBC (V2) links remain decryptable
 - **Key Generation**: Secure random keys using crypto.randomBytes()
 - **Key Structure**: Combined file key (8 chars) + password key (12 chars)
 - **Auto-cleanup**: Scheduled deletion of expired secrets via node-cron

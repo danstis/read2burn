@@ -1,4 +1,5 @@
 lib-cov
+coverage
 *.seed
 *.log
 *.csv
@@ -16,4 +17,3 @@ node_modules
 generate_package_infos.js
 data
 umzug.json
-coverage
