@@ -21,6 +21,8 @@ module.exports = [
         Buffer: 'readonly',
         exports: 'writable',
         fetch: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
         URLSearchParams: 'readonly',
       },
     },

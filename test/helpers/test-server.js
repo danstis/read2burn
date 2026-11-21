@@ -35,7 +35,9 @@ async function startServer(env = {}) {
     exited.then((c) => reject(new Error(`server exited early (${c}); output: ${out}`)));
     child.stdout.on('data', (d) => {
       out += d;
-      if (/listening on port/.test(out)) resolve();
+      if (/listening on port/.test(out)) {
+        resolve();
+      }
     });
   }).catch((e) => {
     child.kill();
