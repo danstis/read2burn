@@ -136,7 +136,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Docker build only for dependabot PRs
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6 (https://github.com/marketplace/actions/build-and-push-docker-images)
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7 (https://github.com/marketplace/actions/build-and-push-docker-images)
         if: ${{ github.actor == 'dependabot[bot]' }}
         with:
           context: ./
@@ -146,7 +146,7 @@ jobs:
             BUILD=${{ steps.gitversion.outputs.semVer }}
 
       - name: Docker build and push pre-release
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6 (https://github.com/marketplace/actions/build-and-push-docker-images)
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7 (https://github.com/marketplace/actions/build-and-push-docker-images)
         if: ${{ steps.gitversion.outputs.PreReleaseTagWithDash != '' && github.actor != 'dependabot[bot]' }}
         with:
           context: ./
@@ -161,7 +161,7 @@ jobs:
             ${{ github.repository }}:${{ steps.gitversion.outputs.prereleaselabel }}
 
       - name: Docker build and push
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6 (https://github.com/marketplace/actions/build-and-push-docker-images)
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7 (https://github.com/marketplace/actions/build-and-push-docker-images)
         if: ${{ steps.gitversion.outputs.PreReleaseTagWithDash == '' && github.actor != 'dependabot[bot]' }}
         with:
           context: ./
