@@ -88,16 +88,21 @@ exports.index = function (req, res) {
                         try {
                             decrypted = crypt.decrypt(doc.encrypted, id);
                         } catch {
-                            return notFound();
-                        } finally {
-                            nedb.remove({ key, consumed: true }, function (err) {
-                                if (err) {
-                                    console.error('Error removing entry:', err);
-                                } else {
-                                    nedb.compactDatafile();
+                            // Decryption failed; release the claim so the secret isn't lost.
+                            nedb.update({ key, consumed: true }, { $unset: { consumed: true, consumedAt: true } }, {}, function (releaseErr) {
+                                if (releaseErr) {
+                                    console.error('Error releasing entry claim:', releaseErr);
                                 }
                             });
+                            return notFound();
                         }
+                        nedb.remove({ key, consumed: true }, function (removeErr) {
+                            if (removeErr) {
+                                console.error('Error removing entry:', removeErr);
+                            } else {
+                                nedb.compactDatafile();
+                            }
+                        });
                         res.render('index', { url: url, secret: decrypted, error: undefined, found: true, version: version });
                     });
                 } else {
