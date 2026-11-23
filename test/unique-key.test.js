@@ -17,10 +17,12 @@ test('migration dedupes by unconsumed > newest timestamp > _id, then enforces un
     { _id: 'f', key: 'k3', timestamp: 1 },
     { _id: 'g', key: 'k4', timestamp: 1, consumed: true },
     { _id: 'h', key: 'k4', timestamp: 8, consumed: true }, // all consumed -> newest
+    { _id: 'x', timestamp: 1 },                            // missing key -> preserved
+    { _id: 'y', key: null, timestamp: 2 },                 // null key -> preserved
   ]);
   await migration.up({ context: db });
   const ids = (await db.findAsync({})).map((d) => d._id).sort();
-  assert.deepEqual(ids, ['c', 'd', 'f', 'h']);
+  assert.deepEqual(ids, ['c', 'd', 'f', 'h', 'x', 'y']);
   await assert.rejects(db.insertAsync({ key: 'k3' }), { errorType: 'uniqueViolated' });
 });
 

@@ -11,6 +11,9 @@ module.exports = {
   up: async function ({ context: nedb }) {
     const groups = new Map();
     for (const doc of await nedb.findAsync({})) {
+      if (doc.key === undefined || doc.key === null) {
+        continue;
+      }
       if (!groups.has(doc.key)) {
         groups.set(doc.key, []);
       }
