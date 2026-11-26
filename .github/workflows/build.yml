@@ -25,13 +25,13 @@ jobs:
           fetch-depth: 0 # Do a shallow clone for GitVersion
 
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@1918cb0db30e20631f273e322d08c48af11db368 # v4.0.1
+        uses: gittools/actions/gitversion/setup@389fe43e6b0189b98c40c43553070ac029304635 # v5.0.0
         with:
           versionSpec: "6.3.0"
 
       - name: Version with GitVersion # https://github.com/marketplace/actions/use-actions
         id: gitversion
-        uses: gittools/actions/gitversion/execute@1918cb0db30e20631f273e322d08c48af11db368 # v4.0.1
+        uses: gittools/actions/gitversion/execute@389fe43e6b0189b98c40c43553070ac029304635 # v5.0.0
 
       - name: Check out code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -114,13 +114,13 @@ jobs:
           fetch-depth: 0
 
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@1918cb0db30e20631f273e322d08c48af11db368 # v4.0.1
+        uses: gittools/actions/gitversion/setup@389fe43e6b0189b98c40c43553070ac029304635 # v5.0.0
         with:
           versionSpec: "6.3.0"
 
       - name: Version with GitVersion # https://github.com/marketplace/actions/use-actions
         id: gitversion
-        uses: gittools/actions/gitversion/execute@1918cb0db30e20631f273e322d08c48af11db368 # v4.0.1
+        uses: gittools/actions/gitversion/execute@389fe43e6b0189b98c40c43553070ac029304635 # v5.0.0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4
@@ -187,13 +187,13 @@ jobs:
           fetch-depth: 0
 
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@1918cb0db30e20631f273e322d08c48af11db368 # v4.0.1
+        uses: gittools/actions/gitversion/setup@389fe43e6b0189b98c40c43553070ac029304635 # v5.0.0
         with:
           versionSpec: "6.3.0"
 
       - name: Version with GitVersion # https://github.com/marketplace/actions/use-actions
         id: gitversion
-        uses: gittools/actions/gitversion/execute@1918cb0db30e20631f273e322d08c48af11db368 # v4.0.1
+        uses: gittools/actions/gitversion/execute@389fe43e6b0189b98c40c43553070ac029304635 # v5.0.0
 
       - name: Bump version and push tag
         id: tag_version
