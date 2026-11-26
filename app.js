@@ -57,8 +57,10 @@ app.use(function (err, req, res, next) {
 });
 
 // migrations must finish before we accept requests; a failure must be loud, never a silent half-upgrade
-umzug
-  .up()
+// Order: datafile loaded -> migrations (dedupe keys) -> unique index -> listen.
+nedb.autoloadPromise
+  .then(() => umzug.up())
+  .then(() => nedb.ensureIndexAsync({ fieldName: "key", unique: true }))
   .then(function () {
     http.createServer(app).listen(app.get("port"), function () {
       console.log("Express server listening on port " + app.get("port"));
