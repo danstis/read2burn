@@ -76,30 +76,43 @@ exports.index = function (req, res) {
                 res.send('Invalid argument.');
             } else {
                 const key = crypt.parseKey(id);
-                nedb.findOne({ key }, function (err, doc) {
-                    if (err) {
-                        res.render('index', { url: url, secret: false, error: ERR_NO_SUCH_ENTRY, found: false, version: version });
-                    } else {
-                        try {
-                            if (doc.encrypted && req.body.show) {
-                                const encrypted = doc.encrypted;
-                                const decrypted = crypt.decrypt(encrypted, id);
-                                nedb.remove({ key }, function (err, numDeleted) {
-                                    if (err) {
-                                        console.error('Error removing entry:', err);
-                                    } else {
-                                        nedb.compactDatafile();
-                                    }
-                                });
-                                res.render('index', { url: url, secret: decrypted, error: undefined, found: true, version: version });
-                            } else {
-                                res.render('index', { url: url, secret: false, error: undefined, found: true, id: id, version: version });
-                            }
-                        } catch {
-                            res.render('index', { url: url, secret: false, error: ERR_NO_SUCH_ENTRY, found: false, version: version });
+                const notFound = () => res.render('index', { url: url, secret: false, error: ERR_NO_SUCH_ENTRY, found: false, version: version });
+                const live = { key, consumed: { $ne: true } };
+                if (req.body.show) {
+                    // Atomically claim the entry; only one concurrent request gets the doc back.
+                    nedb.update(live, { $set: { consumed: true, consumedAt: new Date().getTime() } }, { returnUpdatedDocs: true }, function (err, numAffected, doc) {
+                        if (err || !numAffected || !doc || !doc.encrypted) {
+                            return notFound();
                         }
-                    }
-                });
+                        let decrypted;
+                        try {
+                            decrypted = crypt.decrypt(doc.encrypted, id);
+                        } catch {
+                            // Decryption failed; release the claim so the secret isn't lost.
+                            nedb.update({ key, consumed: true }, { $unset: { consumed: true, consumedAt: true } }, {}, function (releaseErr) {
+                                if (releaseErr) {
+                                    console.error('Error releasing entry claim:', releaseErr);
+                                }
+                            });
+                            return notFound();
+                        }
+                        nedb.remove({ key, consumed: true }, function (removeErr) {
+                            if (removeErr) {
+                                console.error('Error removing entry:', removeErr);
+                            } else {
+                                nedb.compactDatafile();
+                            }
+                        });
+                        res.render('index', { url: url, secret: decrypted, error: undefined, found: true, version: version });
+                    });
+                } else {
+                    nedb.findOne(live, function (err, doc) {
+                        if (err || !doc || !doc.encrypted) {
+                            return notFound();
+                        }
+                        res.render('index', { url: url, secret: false, error: undefined, found: true, id: id, version: version });
+                    });
+                }
             }
         } else {
             res.render('index', { url: url, secret: encrypted, error: undefined, found: false, version: version });
