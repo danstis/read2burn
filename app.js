@@ -11,7 +11,31 @@ const express = require("express"),
   { cleanupExpired } = require("./lib/cleanup"),
   version = require("./version");
 
+const { URL } = require("node:url");
 const app = express();
+
+// Optional canonical base URL for share links (mitigates Host header injection).
+function parsePublicUrl(raw) {
+  if (!raw) {
+    return null;
+  }
+  let u;
+  try {
+    u = new URL(raw);
+  } catch {
+    throw new Error(`READ2BURN_PUBLIC_URL is not a valid absolute URL: ${raw}`);
+  }
+  if (u.protocol !== "http:" && u.protocol !== "https:") {
+    throw new Error("READ2BURN_PUBLIC_URL must use http: or https:");
+  }
+  u.search = "";
+  u.hash = "";
+  if (!u.pathname.endsWith("/")) {
+    u.pathname += "/";
+  }
+  return u.href;
+}
+module.exports.publicBaseUrl = parsePublicUrl(process.env.READ2BURN_PUBLIC_URL);
 
 const i18n = require("i18n");
 

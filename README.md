@@ -26,3 +26,12 @@ Load the required modules.
 Start the application.
 
     `node app.js`
+
+## Configuration
+
+`READ2BURN_PUBLIC_URL` (optional): canonical base URL used for generated share links, ignoring request `Host` / `X-Forwarded-*` headers to prevent Host Header Injection. Must be an absolute `http(s)` URL; a query string or hash is dropped. Examples:
+
+- `READ2BURN_PUBLIC_URL=https://read2burn.example.com`
+- `READ2BURN_PUBLIC_URL=https://read2burn.example.com/read2burn`
+
+The app exits at startup if the value is invalid. When unset, links are built from the request.
