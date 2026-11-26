@@ -6,6 +6,7 @@ services:
     image: danstis/read2burn:prerelease
     container_name: read2burn
     restart: unless-stopped
+    user: "node"
     ports:
       - 127.0.0.1:3300:3300
     volumes:
@@ -13,4 +14,5 @@ services:
     environment:
       - CLEANUP_CRON=* * * * *
       - EXPIRY=60000
+      # - READ2BURN_MAX_SECRET_CHARS=4000
       # - REL_PATH=/r2b
